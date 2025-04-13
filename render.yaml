@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: email-scraper
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python email_scraper/web_app.py"
+    autoDeploy: true
