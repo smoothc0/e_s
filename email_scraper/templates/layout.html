@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Scraper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script defer>
+        // Did You Know rotation
+        const facts = [
+            "The first email was sent in 1971!",
+            "Email scraping helps generate leads for businesses.",
+            "Spam emails account for over 50% of all emails sent.",
+            "The '@' symbol was chosen for emails because it was rarely used."
+        ];
+        let index = 0;
+        setInterval(() => {
+            document.getElementById("fact").textContent = facts[index];
+            index = (index + 1) % facts.length;
+        }, 30000);
+    </script>
+</head>
+<body class="light-mode">
+    <header>
+        <h1>Email Scraper</h1>
+        <button onclick="toggleMode()">Toggle Light/Dark Mode</button>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <div id="fact">Did you know? The first email was sent in 1971!</div>
+    </footer>
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>
