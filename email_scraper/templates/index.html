@@ -1,60 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Email Scraper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background-color: #f4f4f4;
+        :root {
+            --bg-color: #fff;
+            --text-color: #222;
+            --accent-color: #ff6f00;
+            --box-color: #f9f9f9;
         }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #f0f0f0;
+            --accent-color: #ffa726;
+            --box-color: #1e1e1e;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
         h1 {
             text-align: center;
+            color: var(--accent-color);
         }
+
         form {
             text-align: center;
             margin-bottom: 30px;
         }
+
         input[type="text"] {
             padding: 10px;
             width: 300px;
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
         }
+
         button {
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: var(--accent-color);
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background-color: #e65100;
         }
+
         .results {
-            background-color: white;
+            background-color: var(--box-color);
             padding: 20px;
             border-radius: 8px;
             max-width: 600px;
             margin: 0 auto;
         }
+
         ul {
             list-style-type: none;
             padding: 0;
         }
+
         li {
-            background: #e9ecef;
+            background: #ffecb3;
             margin: 5px 0;
             padding: 10px;
             border-radius: 4px;
+            color: #444;
         }
+
         .download {
             text-align: center;
             margin-top: 20px;
         }
+
+        #fun-fact {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+            color: var(--accent-color);
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-overlay[data-theme="dark"] {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .hourglass {
+            font-size: 48px;
+            animation: spin 1.5s linear infinite;
+            color: var(--accent-color);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toggle-theme {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: none;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .toggle-theme:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
     </style>
 </head>
-<body>
+<body data-theme="light">
+
+    <button class="toggle-theme" onclick="toggleTheme()">🌗 Toggle Theme</button>
+
     <h1>Email Scraper</h1>
-    <form method="post">
+
+    <form method="post" onsubmit="showLoader()">
         <input type="text" name="keyword" placeholder="Enter keyword..." required>
         <button type="submit">Scrape</button>
     </form>
@@ -74,5 +163,39 @@
         </div>
     </div>
     {% endif %}
+
+    <div id="fun-fact">💡 Did you know? This scraper digs deep like a data archaeologist!</div>
+
+    <div class="loader-overlay" id="loader">
+        <div class="hourglass">⏳</div>
+    </div>
+
+    <script>
+        const facts = [
+            "💡 Did you know? Email scraping helps avoid manual copy-paste.",
+            "💡 This scraper can uncover hidden emails buried in web pages.",
+            "💡 Did you know? Over 300 billion emails are sent every day.",
+            "💡 You can filter bad domains before saving results.",
+            "💡 Scraping responsibly = good netiquette!",
+            "💡 Always use scraped emails ethically 🔒"
+        ];
+
+        let index = 0;
+        setInterval(() => {
+            index = (index + 1) % facts.length;
+            document.getElementById("fun-fact").innerText = facts[index];
+        }, 30000); // 30 seconds
+
+        function showLoader() {
+            document.getElementById("loader").style.display = "flex";
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute("data-theme");
+            const next = current === "dark" ? "light" : "dark";
+            body.setAttribute("data-theme", next);
+        }
+    </script>
 </body>
 </html>
