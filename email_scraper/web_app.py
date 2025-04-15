@@ -1,13 +1,36 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, send_from_directory, redirect, url_for, session
 import os
 from main import run_scraper
 
 app = Flask(__name__)
+app.secret_key = 'change_this_secret_to_something_random'
+
+# Optional security configs
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 OUTPUT_DIR = 'output'
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html')
+
+@app.route('/subscribe/<plan>')
+def subscribe(plan):
+    session['subscribed'] = True
+    session['plan'] = plan
+    return redirect(url_for('scraper'))
+
+@app.route('/scraper', methods=['GET', 'POST'])
+def scraper():
+    if not session.get('subscribed'):
+        return redirect(url_for('pricing'))
+
     emails = None
     keyword = None
     file = None
@@ -18,11 +41,7 @@ def index():
         emails = result.get('emails')
         file = os.path.basename(result.get('file')) if result.get('file') else None
 
-    return render_template('index.html', emails=emails, keyword=keyword, file=file)
-
-@app.route('/pricing')
-def pricing():
-    return render_template('pricing.html')
+    return render_template('scraper.html', emails=emails, keyword=keyword, file=file, plan=session.get('plan'))
 
 @app.route('/contact')
 def contact():
