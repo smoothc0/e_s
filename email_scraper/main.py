@@ -61,3 +61,4 @@ if __name__ == "__main__":
         print(f"\n✅ Collected {len(result['emails'])} emails.")
     else:
         print("❌ No emails found.")
+
