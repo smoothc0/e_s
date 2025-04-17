@@ -6,6 +6,9 @@ app = Flask(__name__)
 
 OUTPUT_DIR = 'output'
 
+# ✅ Ensure the output directory exists on startup
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     emails = None
@@ -17,15 +20,22 @@ def index():
             clear_history()
             return redirect(url_for('index'))
 
-        keyword = request.form['keyword']
-        result = run_scraper(keyword)
-        emails = result.get('emails')
-        file = os.path.basename(result.get('file')) if result.get('file') else None
+        try:
+            keyword = request.form['keyword']
+            result = run_scraper(keyword)
+            emails = result.get('emails')
+            file = os.path.basename(result.get('file')) if result.get('file') else None
+        except Exception as e:
+            print(f"🔥 ERROR during scraping: {e}")  # ✅ Helpful log
+            return "An error occurred while processing your request.", 500
 
     return render_template('index.html', emails=emails, keyword=keyword, file=file)
 
 @app.route('/download/<filename>')
 def download_file(filename):
+    filepath = os.path.join(OUTPUT_DIR, filename)
+    if not os.path.exists(filepath):
+        return "File not found.", 404  # ✅ Avoid crashing if file is missing
     return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
 
 if __name__ == "__main__":
