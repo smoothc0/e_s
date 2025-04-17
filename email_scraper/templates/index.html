@@ -7,6 +7,7 @@
             --lavender: #b57edc;
             --black: #121212;
             --white: #f5f5f5;
+            --orange: #ff7f50;
         }
 
         body {
@@ -17,7 +18,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        .light-mode {
+        body.light-mode {
             background-color: var(--white);
             color: var(--black);
         }
@@ -39,6 +40,10 @@
             color: inherit;
         }
 
+        body.light-mode input[type="text"] {
+            border-color: var(--orange);
+        }
+
         button {
             padding: 10px 20px;
             background-color: var(--lavender);
@@ -47,8 +52,13 @@
             cursor: pointer;
         }
 
+        body.light-mode button {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+
         button:hover {
-            background-color: #a152c6;
+            opacity: 0.9;
         }
 
         .results {
@@ -57,6 +67,10 @@
             border-radius: 8px;
             max-width: 600px;
             margin: 0 auto;
+        }
+
+        body.light-mode .results {
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
         ul {
@@ -69,6 +83,10 @@
             margin: 5px 0;
             padding: 10px;
             border-radius: 4px;
+        }
+
+        body.light-mode li {
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .download, .fun-fact, .mode-toggle {
@@ -90,6 +108,11 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: auto;
+        }
+
+        body.light-mode .hourglass {
+            border-color: var(--orange);
+            border-top: 6px solid transparent;
         }
 
         @keyframes spin {
