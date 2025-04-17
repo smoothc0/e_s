@@ -22,11 +22,21 @@ def save_emails_to_csv(emails, keyword):
     print(f"\n✅ Saved {len(emails)} emails to {filename}")
     return filename  # ✅ Return path for Flask to download
 
+# 📁 Persistent history file
+HISTORY_FILE = "output/email_history.txt"
+
 # ⚙️ This is the core function Flask will call
 def run_scraper(keyword, goal=20):
     all_emails = set()
     urls_seen = set()
     url_offset = 0
+
+    # Load global history of past emails
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            previous_emails = set(line.strip() for line in f)
+    else:
+        previous_emails = set()
 
     while len(all_emails) < goal:
         urls = get_top_urls(keyword, limit=20 + url_offset)
@@ -38,8 +48,11 @@ def run_scraper(keyword, goal=20):
         for url in urls:
             urls_seen.add(url)
             scraper = EmailScraper(base_url=url, max_pages=10)
-            emails = scraper.scrape()
-            all_emails.update(emails)
+            new_emails = scraper.scrape()
+
+            # 🧹 Filter already-known emails
+            filtered_emails = new_emails - previous_emails - all_emails
+            all_emails.update(filtered_emails)
 
             if len(all_emails) >= goal:
                 break
@@ -47,8 +60,15 @@ def run_scraper(keyword, goal=20):
         url_offset += 20
 
     if all_emails:
+        # Save to CSV
         filepath = save_emails_to_csv(all_emails, keyword)
-        return {"emails": list(sorted(all_emails)), "file": f"{sanitize_filename(keyword)}.csv"}
+
+        # 📌 Update global history
+        with open(HISTORY_FILE, "a", encoding="utf-8") as f:
+            for email in sorted(all_emails):
+                f.write(email + "\n")
+
+        return {"emails": list(sorted(all_emails)), "file": os.path.basename(filepath)}
     else:
         return {"emails": [], "file": None}
 
@@ -61,4 +81,3 @@ if __name__ == "__main__":
         print(f"\n✅ Collected {len(result['emails'])} emails.")
     else:
         print("❌ No emails found.")
-
