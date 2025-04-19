@@ -53,7 +53,7 @@ def run_scraper(keyword, goal=20):
 
         for url in urls:
             urls_seen.add(url)
-            scraper = EmailScraper(base_url=url)  # Simplified constructor
+            scraper = EmailScraper(base_url=url, max_pages=10)
             emails = scraper.scrape_with_sources()
             for email in emails:
                 if email not in history and email not in all_emails:
