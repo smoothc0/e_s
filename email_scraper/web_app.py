@@ -1,55 +1,29 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, send_from_directory
 import os
-import csv
-from datetime import datetime
-from scraper import EmailScraper
+from main import run_scraper  # Make sure this function exists in main.py
 
 app = Flask(__name__)
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+OUTPUT_DIR = 'output'
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    emails = None
+    keyword = None
+    file = None
 
-@app.route('/product')
-def product():
-    return render_template('product.html')
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/pricing')
-def pricing():
-    return render_template('pricing.html')
-
-@app.route('/scrape', methods=['GET', 'POST'])
-def scrape():
     if request.method == 'POST':
-        url = request.form.get('url')
-        if not url:
-            return render_template('index.html', error="Please enter a valid URL.")
+        keyword = request.form['keyword']
+        result = run_scraper(keyword)
+        emails = result.get('emails')
+        file = os.path.basename(result.get('file')) if result.get('file') else None
 
-        scraper = EmailScraper(url)
-        results = scraper.scrape_with_sources()
+    return render_template('index.html', emails=emails, keyword=keyword, file=file)
 
-        # Save to CSV
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        filename = f"emails_{timestamp}.csv"
-        filepath = os.path.join(OUTPUT_DIR, filename)
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
 
-        with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['Email', 'Source URL'])
-            for email, source in results.items():
-                writer.writerow([email, source])
-
-        return render_template('results.html', results=results, filename=filename)
-    
-    return redirect(url_for('home'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))  # Render sets PORT
+    app.run(host="0.0.0.0", port=port)         # Bind to all IPs for external access
