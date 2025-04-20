@@ -24,9 +24,25 @@ def index():
 
     return render_template('index.html', emails=emails, keyword=keyword, file=file)
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/product')
+def product():
+    return render_template('product.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')  # You’ll want to create templates/contact.html too
+
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template("404.html"), 404  # Optional, create 404.html if desired
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Company Name – About</title>
   <style>
-    /* Reset & base */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; }
 
-    /* Header/Nav */
     header {
       background: #fff;
       position: sticky; top: 0; z-index: 100;
@@ -21,33 +19,29 @@
       margin-left: 1.5rem; text-decoration: none; color: #000;
       font-size: 1.1rem; position: relative; -webkit-text-fill-color: #000;
     }
-    nav a:not([href="index.html"]):hover {
-      background: linear-gradient(
-        90deg,
-        rgba(160,253,253,1) 0%,
-        rgba(0,200,200,1) 50%,
-        rgba(160,253,253,1) 100%
-      );
+    nav a:hover {
+      background: linear-gradient(90deg, rgba(160,253,253,1) 0%, rgba(0,200,200,1) 50%, rgba(160,253,253,1) 100%);
       background-size: 200% 100%;
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: gradientSlide 2.5s ease-in-out infinite;
     }
+
     @keyframes gradientSlide {
       0%   { background-position: 0% 50%; }
       100% { background-position: 200% 50%; }
     }
 
-    /* Full‑bleed background */
     .hero {
-  min-height: 100vh;
-  background: url('DESCRIPTION.png') no-repeat center center;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 72px; /* ensures content clears sticky header */
-  box-sizing: border-box;
+      min-height: 100vh;
+      background: url('{{ url_for("static", filename="images/DESCRIPTION.png") }}') no-repeat center center;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 72px;
+      box-sizing: border-box;
     }
 
     .hero .overlay {
@@ -71,10 +65,10 @@
   <header>
     <div class="logo">Company Name</div>
     <nav>
-      <a href="index.html">Home</a>
-      <a href="product.html">Product</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('product') }}">Product</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
     </nav>
   </header>
 
@@ -82,7 +76,7 @@
     <div class="overlay">
       <h1>About Us</h1>
       <p>
-        Here’s where you tell your story.<br/>
+        Heres where you tell your story.<br/>
         Mission, vision, team highlights…<br/>
         Feel free to swap in your own text!
       </p>
@@ -91,5 +85,3 @@
 
 </body>
 </html>
-
-
