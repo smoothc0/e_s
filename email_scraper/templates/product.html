@@ -6,7 +6,7 @@
   <title>Company Name – Product</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #a3b1ad; }
+    body { font-family: Arial, sans-serif; background: url('{{ url_for("static", filename="2.png") }}') no-repeat center center; background-size: cover; }
 
     header {
       background: #fff;
@@ -17,7 +17,7 @@
     .logo { font-size: 1.5rem; font-weight: bold; }
     nav a {
       margin-left: 1.5rem; text-decoration: none; color: #000;
-      font-size: 1.1rem; position: relative; -webkit-text-fill-color: #000;
+      font-size: 1.1rem; position: relative;
     }
     nav a:hover {
       background: linear-gradient(90deg, rgba(160,253,253,1) 0%, rgba(0,200,200,1) 50%, rgba(160,253,253,1) 100%);
@@ -60,7 +60,6 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      backface-visibility: hidden;
     }
     .card button {
       padding: 0.75rem 1.5rem;
@@ -92,24 +91,30 @@
     <div class="card">
       <div class="card-content">
         <h2>Product A</h2>
-        <p>Short description of A...</p>
-        <button>Learn More</button>
+        <p>Basic scraping package</p>
+        <form action="{{ url_for('scrape') }}" method="get">
+          <button type="submit">Subscribe</button>
+        </form>
       </div>
     </div>
 
     <div class="card">
       <div class="card-content">
         <h2>Product B</h2>
-        <p>Short description of B...</p>
-        <button>Learn More</button>
+        <p>Standard scraping package</p>
+        <form action="{{ url_for('scrape') }}" method="get">
+          <button type="submit">Subscribe</button>
+        </form>
       </div>
     </div>
 
     <div class="card">
       <div class="card-content">
         <h2>Product C</h2>
-        <p>Short description of C...</p>
-        <button>Learn More</button>
+        <p>Premium scraping package</p>
+        <form action="{{ url_for('scrape') }}" method="get">
+          <button type="submit">Subscribe</button>
+        </form>
       </div>
     </div>
   </section>

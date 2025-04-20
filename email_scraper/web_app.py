@@ -1,49 +1,49 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 import os
-from main import run_scraper, clear_history
+from datetime import datetime
+from scraper import scrape_emails
 
 app = Flask(__name__)
 
-OUTPUT_DIR = 'output'
-
-@app.route('/', methods=['GET', 'POST'])
+# Home
+@app.route('/')
 def index():
-    emails = None
-    keyword = None
-    file = None
+    return render_template('index.html')
 
-    if request.method == 'POST':
-        if 'clear' in request.form:
-            clear_history()
-            return redirect(url_for('index'))
-
-        keyword = request.form['keyword']
-        result = run_scraper(keyword)
-        emails = result.get('emails')
-        file = os.path.basename(result.get('file')) if result.get('file') else None
-
-    return render_template('index.html', emails=emails, keyword=keyword, file=file)
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
+# Product Page
 @app.route('/product')
 def product():
     return render_template('product.html')
 
+# About Page
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+# Contact Page
 @app.route('/contact')
 def contact():
-    return render_template('contact.html')  # You’ll want to create templates/contact.html too
+    return render_template('contact.html')
 
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
+# Scraper Page
+@app.route('/scrape', methods=['GET', 'POST'])
+def scrape():
+    if request.method == 'POST':
+        keyword = request.form['keyword']
+        results = scrape_emails(keyword)
 
-@app.errorhandler(404)
-def not_found(e):
-    return render_template("404.html"), 404  # Optional, create 404.html if desired
+        # Save results to output CSV
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{keyword.replace(' ', '_')}_{timestamp}.csv"
+        filepath = os.path.join('output', filename)
+        with open(filepath, 'w') as f:
+            f.write("Email\n")
+            for email in results:
+                f.write(email + "\n")
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+        return render_template('scrape.html', emails=results, keyword=keyword)
+
+    return render_template('scrape.html', emails=None)
+
+if __name__ == '__main__':
+    app.run(debug=True)
