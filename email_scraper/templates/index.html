@@ -128,28 +128,12 @@
 
     <h1>Email Scraper</h1>
 
-    <form method="post" onsubmit="showLoader()">
-        <input type="text" name="keyword" placeholder="Enter keyword..." required>
+    <form id="scrape-form" onsubmit="startStreaming(event)">
+        <input type="text" id="keyword" name="keyword" placeholder="Enter keyword..." required>
         <button type="submit">Scrape</button>
     </form>
 
     <div id="loader"><div class="hourglass"></div></div>
-
-    {% if emails %}
-    <div class="results">
-        <h2>Found {{ emails|length }} emails for "{{ keyword }}":</h2>
-        <ul>
-            {% for email in emails %}
-            <li>{{ email }}</li>
-            {% endfor %}
-        </ul>
-        <div class="download">
-            <a href="/download/{{ file }}">
-                <button>Download CSV</button>
-            </a>
-        </div>
-    </div>
-    {% endif %}
 
     <div class="fun-fact" id="fun-fact">
         💡 Did you know? Email scraping helps marketers find leads in real-time!
@@ -170,12 +154,41 @@
             document.getElementById("fun-fact").textContent = funFacts[factIndex];
         }, 30000);
 
-        function showLoader() {
-            document.getElementById("loader").style.display = "block";
-        }
-
         function toggleMode() {
             document.body.classList.toggle("light-mode");
+        }
+
+        function startStreaming(e) {
+            e.preventDefault();
+            document.getElementById("loader").style.display = "block";
+            document.querySelector(".results")?.remove(); // remove old result
+            const keyword = document.getElementById("keyword").value;
+
+            const eventSource = new EventSource(`/stream?keyword=${encodeURIComponent(keyword)}`);
+            const resultsDiv = document.createElement("div");
+            resultsDiv.className = "results";
+            resultsDiv.innerHTML = `<h2>Found emails for "${keyword}":</h2><ul id="email-list"></ul>`;
+            document.body.appendChild(resultsDiv);
+
+            const emailList = document.getElementById("email-list");
+
+            eventSource.onmessage = function(event) {
+                if (event.data === "START") return;
+
+                if (event.data.startsWith("DONE|")) {
+                    const filename = event.data.split("|")[1];
+                    const downloadDiv = document.createElement("div");
+                    downloadDiv.className = "download";
+                    downloadDiv.innerHTML = `<a href="/download/${filename}"><button>Download CSV</button></a>`;
+                    resultsDiv.appendChild(downloadDiv);
+                    document.getElementById("loader").style.display = "none";
+                    eventSource.close();
+                } else {
+                    const li = document.createElement("li");
+                    li.textContent = event.data;
+                    emailList.appendChild(li);
+                }
+            };
         }
     </script>
 </body>
