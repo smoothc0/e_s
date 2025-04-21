@@ -1,195 +1,484 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Email Scraper</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTACTSCRAPE</title>
     <style>
-        :root {
-            --lavender: #b57edc;
-            --black: #121212;
-            --white: #f5f5f5;
-            --orange: #ff7f50;
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
-
+        
         body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background-color: var(--black);
-            color: var(--lavender);
-            transition: background-color 0.3s, color 0.3s;
+            background-color: #ffffff;
+            color: #333;
         }
-
-        body.light-mode {
-            background-color: var(--white);
-            color: var(--black);
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        form {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            width: 300px;
-            border: 2px solid var(--lavender);
-            background-color: transparent;
+        
+        a {
+            text-decoration: none;
             color: inherit;
         }
-
-        body.light-mode input[type="text"] {
-            border-color: var(--orange);
+        
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-
-        button {
-            padding: 10px 20px;
-            background-color: var(--lavender);
-            color: var(--black);
-            border: none;
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4500;
+        }
+        
+        .logo span {
+            color: #333;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav ul li {
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
-
-        body.light-mode button {
-            background-color: var(--orange);
-            color: var(--white);
+        
+        nav ul li:hover {
+            color: #ff4500;
         }
-
-        button:hover {
-            opacity: 0.9;
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 50px;
+            min-height: 80vh;
         }
-
-        .results {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 8px;
+        
+        .home-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 50px 0;
+        }
+        
+        .home-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff4500;
+        }
+        
+        .home-content p {
+            font-size: 18px;
+            max-width: 700px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        /* Pricing Page Styles */
+        .pricing-page {
+            display: none;
+            padding: 30px 0;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .pricing-header h1 {
+            font-size: 36px;
+            color: #ff4500;
+            margin-bottom: 15px;
+        }
+        
+        .pricing-header p {
+            font-size: 16px;
+            color: #666;
             max-width: 600px;
             margin: 0 auto;
         }
-
-        body.light-mode .results {
-            background-color: rgba(0, 0, 0, 0.05);
+        
+        .pricing-plans {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
         }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
+        
+        .plan-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 280px;
+            padding: 30px;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
-        li {
-            background: rgba(255, 255, 255, 0.1);
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 4px;
+        
+        .plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
-
-        body.light-mode li {
-            background: rgba(0, 0, 0, 0.1);
+        
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background-color: #ff4500;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
         }
-
-        .download, .fun-fact, .mode-toggle {
+        
+        .plan-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .plan-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .plan-price {
+            margin-bottom: 20px;
+        }
+        
+        .original-price {
+            font-size: 24px;
+            color: #ff4500;
+            font-weight: bold;
+        }
+        
+        .discount {
+            font-size: 14px;
+            color: #ff4500;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .monthly-price {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .free-months {
+            background-color: #fff4f0;
+            color: #ff4500;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .choose-plan-btn {
+            display: block;
+            background-color: #ff4500;
+            color: white;
             text-align: center;
-            margin-top: 20px;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background-color 0.3s;
         }
-
-        #loader {
+        
+        .choose-plan-btn:hover {
+            background-color: #e03e00;
+        }
+        
+        .billing-info {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+        
+        .plan-features {
+            list-style: none;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        /* How to Use and About Us Pages */
+        .info-page {
             display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .info-page h1 {
+            font-size: 36px;
+            color: #ff4500;
+            margin-bottom: 20px;
+        }
+        
+        .info-page p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 30px 50px;
             text-align: center;
-            margin: 20px auto;
         }
-
-        .hourglass {
-            width: 40px;
-            height: 40px;
-            border: 6px solid var(--lavender);
-            border-top: 6px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: auto;
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
-        body.light-mode .hourglass {
-            border-color: var(--orange);
-            border-top: 6px solid transparent;
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ff4500;
+        }
+        
+        .footer-section p, .footer-section a {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .footer-section a:hover {
+            color: #ff4500;
+        }
+        
+        .copyright {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            font-size: 14px;
+            color: #999;
         }
     </style>
 </head>
 <body>
-    <div class="mode-toggle">
-        <button onclick="toggleMode()">Toggle Light/Dark Mode</button>
+    <!-- Header -->
+    <header>
+        <div class="logo">CONTACT<span>SCRAPE</span></div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showHome()">Home</a></li>
+                <li><a href="#" onclick="showPricing()">Pricing</a></li>
+                <li><a href="#" onclick="showHowToUse()">How to use?</a></li>
+                <li><a href="#" onclick="showAboutUs()">About us</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Home Page -->
+        <div class="home-content" id="home-page">
+            <h1>Extract Contacts Like Never Before</h1>
+            <p>CONTACTSCRAPE is the most powerful contact extraction tool on the market. Get accurate contact information from any website with just a few clicks.</p>
+            <a href="#" class="choose-plan-btn" onclick="showPricing()">View Pricing Plans</a>
+        </div>
+        
+        <!-- Pricing Page -->
+        <div class="pricing-page" id="pricing-page">
+            <div class="pricing-header">
+                <h1>Pick your perfect plan</h1>
+                <p>Get started in complete confidence. Our 30-day money-back guarantee means it's risk-free.</p>
+            </div>
+            
+            <div class="pricing-plans">
+                <!-- Basic Plan -->
+                <div class="plan-card">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-description">A great solution for beginners</div>
+                    <div class="plan-price">
+                        <span class="original-price">$21.00</span>
+                        <span class="discount">SAVE 67%</span>
+                        <div class="monthly-price">$7.00 /mo</div>
+                    </div>
+                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <div class="billing-info">Renews at $21.00/mo. Cancel anytime.</div>
+                    <ul class="plan-features">
+                        <li>feat1</li>
+                        <li>feat2</li>
+                        <li>feat3</li>
+                        <li>feat4</li>
+                        <li>feat5</li>
+                    </ul>
+                </div>
+                
+                <!-- Popular Plan -->
+                <div class="plan-card">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-description">Everything you need for professional use</div>
+                    <div class="plan-price">
+                        <span class="original-price">$42.00</span>
+                        <span class="discount">SAVE 67%</span>
+                        <div class="monthly-price">$14.00 /mo</div>
+                    </div>
+                    <div class="free-months">-3 months free</div>
+                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <div class="billing-info">Renews at $42.00/mo. Cancel anytime.</div>
+                    <ul class="plan-features">
+                        <li>feat1</li>
+                        <li>feat2</li>
+                        <li>feat3</li>
+                        <li>feat4</li>
+                        <li>feat5</li>
+                        <li>feat6</li>
+                    </ul>
+                </div>
+                
+                <!-- Business Plan -->
+                <div class="plan-card">
+                    <div class="plan-name">Business</div>
+                    <div class="plan-description">Level up with more power and enhanced features</div>
+                    <div class="plan-price">
+                        <span class="original-price">$63.00</span>
+                        <span class="discount">SAVE 67%</span>
+                        <div class="monthly-price">$21.00 /mo</div>
+                    </div>
+                    <div class="free-months">-3 months free</div>
+                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <div class="billing-info">Renews at $63.00/mo. Cancel anytime.</div>
+                    <ul class="plan-features">
+                        <li>feat1</li>
+                        <li>feat2</li>
+                        <li>feat3</li>
+                        <li>feat4</li>
+                        <li>feat5</li>
+                        <li>feat6</li>
+                        <li>feat7</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How to Use Page -->
+        <div class="info-page" id="how-to-use-page">
+            <h1>How to Use CONTACTSCRAPE</h1>
+            <p>feat1: Description of how to use feature 1</p>
+            <p>feat2: Description of how to use feature 2</p>
+            <p>feat3: Description of how to use feature 3</p>
+            <p>feat4: Description of how to use feature 4</p>
+            <p>feat5: Description of how to use feature 5</p>
+        </div>
+        
+        <!-- About Us Page -->
+        <div class="info-page" id="about-us-page">
+            <h1>About Us</h1>
+            <p>feat1: Information about your company and mission</p>
+            <p>feat2: Your team and expertise</p>
+            <p>feat3: Company values and vision</p>
+            <p>feat4: Customer success stories</p>
+            <p>feat5: Contact information</p>
+        </div>
     </div>
-
-    <h1>Email Scraper</h1>
-
-    <form id="scrape-form" onsubmit="startStreaming(event)">
-        <input type="text" id="keyword" name="keyword" placeholder="Enter keyword..." required>
-        <button type="submit">Scrape</button>
-    </form>
-
-    <div id="loader"><div class="hourglass"></div></div>
-
-    <div class="fun-fact" id="fun-fact">
-        💡 Did you know? Email scraping helps marketers find leads in real-time!
-    </div>
-
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CONTACTSCRAPE</h3>
+                <p>The most powerful contact extraction tool on the market.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#" onclick="showHome()">Home</a>
+                <a href="#" onclick="showPricing()">Pricing</a>
+                <a href="#" onclick="showHowToUse()">How to Use</a>
+                <a href="#" onclick="showAboutUs()">About Us</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@contactscrape.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2023 CONTACTSCRAPE. All rights reserved.
+        </div>
+    </footer>
+    
     <script>
-        const funFacts = [
-            "💡 Did you know? Email scraping helps marketers find leads in real-time!",
-            "💡 Some scrapers can scan hundreds of pages in minutes!",
-            "💡 Avoid scraping login-protected sites—it’s often against TOS.",
-            "💡 Email scraping can help automate your sales funnel!",
-            "💡 Domains like 'noreply' are filtered out to reduce junk!"
-        ];
-
-        let factIndex = 0;
-        setInterval(() => {
-            factIndex = (factIndex + 1) % funFacts.length;
-            document.getElementById("fun-fact").textContent = funFacts[factIndex];
-        }, 30000);
-
-        function toggleMode() {
-            document.body.classList.toggle("light-mode");
+        // Function to show home page
+        function showHome() {
+            document.getElementById('home-page').style.display = 'flex';
+            document.getElementById('pricing-page').style.display = 'none';
+            document.getElementById('how-to-use-page').style.display = 'none';
+            document.getElementById('about-us-page').style.display = 'none';
         }
-
-        function startStreaming(e) {
-            e.preventDefault();
-            document.getElementById("loader").style.display = "block";
-            document.querySelector(".results")?.remove(); // remove old result
-            const keyword = document.getElementById("keyword").value;
-
-            const eventSource = new EventSource(`/stream?keyword=${encodeURIComponent(keyword)}`);
-            const resultsDiv = document.createElement("div");
-            resultsDiv.className = "results";
-            resultsDiv.innerHTML = `<h2>Found emails for "${keyword}":</h2><ul id="email-list"></ul>`;
-            document.body.appendChild(resultsDiv);
-
-            const emailList = document.getElementById("email-list");
-
-            eventSource.onmessage = function(event) {
-                if (event.data === "START") return;
-
-                if (event.data.startsWith("DONE|")) {
-                    const filename = event.data.split("|")[1];
-                    const downloadDiv = document.createElement("div");
-                    downloadDiv.className = "download";
-                    downloadDiv.innerHTML = `<a href="/download/${filename}"><button>Download CSV</button></a>`;
-                    resultsDiv.appendChild(downloadDiv);
-                    document.getElementById("loader").style.display = "none";
-                    eventSource.close();
-                } else {
-                    const li = document.createElement("li");
-                    li.textContent = event.data;
-                    emailList.appendChild(li);
-                }
-            };
+        
+        // Function to show pricing page
+        function showPricing() {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('pricing-page').style.display = 'block';
+            document.getElementById('how-to-use-page').style.display = 'none';
+            document.getElementById('about-us-page').style.display = 'none';
         }
+        
+        // Function to show how to use page
+        function showHowToUse() {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('pricing-page').style.display = 'none';
+            document.getElementById('how-to-use-page').style.display = 'block';
+            document.getElementById('about-us-page').style.display = 'none';
+        }
+        
+        // Function to show about us page
+        function showAboutUs() {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('pricing-page').style.display = 'none';
+            document.getElementById('how-to-use-page').style.display = 'none';
+            document.getElementById('about-us-page').style.display = 'block';
+        }
+        
+        // Show home page by default when page loads
+        window.onload = showHome;
     </script>
 </body>
 </html>
