@@ -2,12 +2,18 @@ from flask import Flask, render_template, request, send_from_directory, Response
 import os
 from main import run_scraper, run_scraper_streaming, sanitize_filename
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
 OUTPUT_DIR = 'output'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        keyword = request.form.get('keyword')
+        if keyword:
+            result = run_scraper(keyword)
+            if result["file"]:
+                return render_template('index.html', download_file=result["file"], emails=result["emails"])
     return render_template('index.html')
 
 @app.route('/download/<filename>')
@@ -22,10 +28,8 @@ def stream():
 
     def generate():
         yield f"data: START\n\n"
-
         for update in run_scraper_streaming(keyword):
             yield f"data: {update}\n\n"
-
         yield f"data: DONE|{sanitize_filename(keyword)}.csv\n\n"
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
