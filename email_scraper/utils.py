@@ -1,6 +1,21 @@
 import re
 from pathlib import Path
 from config import Config
+from email_scraper.config import config  # updated import
+
+def is_valid_email(email):
+    """Validate email against config rules"""
+    email = email.lower()
+    
+    # Check blacklisted domains
+    if any(blacklisted in email for blacklisted in config.BLACKLISTED_DOMAINS):
+        return False
+        
+    # Check allowed domains
+    if not any(email.endswith(domain) for domain in config.ALLOWED_DOMAINS):
+        return False
+        
+    return True
 
 def sanitize_filename(keyword):
     """Convert keyword to safe filename"""
