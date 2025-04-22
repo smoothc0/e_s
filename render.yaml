@@ -4,5 +4,10 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python email_scraper/web_app.py"
+    startCommand: "gunicorn email_scraper.web_app:app"
+    envVars:
+      - key: SERPAPI_KEY
+        value: your_serpapi_key_here
+      - key: SECRET_KEY
+        generateValue: true
     autoDeploy: true
