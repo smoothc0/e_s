@@ -93,109 +93,6 @@
             color: #555;
         }
         
-        /* Search Form Styles */
-        .search-form {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px 0;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .search-input {
-            padding: 12px 15px;
-            flex-grow: 1;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        
-        .search-button {
-            background-color: #ff4500;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .search-button:hover {
-            background-color: #e03e00;
-        }
-        
-        /* Results Section */
-        .results-container {
-            margin-top: 30px;
-            text-align: left;
-            width: 100%;
-            max-width: 800px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .results-count {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #ff4500;
-        }
-        
-        .emails-list {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            background: white;
-        }
-        
-        .email-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-family: monospace;
-        }
-        
-        .email-item:last-child {
-            border-bottom: none;
-        }
-        
-        .download-btn {
-            display: inline-block;
-            background-color: #ff4500;
-            color: white;
-            text-align: center;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 15px;
-            transition: background-color 0.3s;
-        }
-        
-        .download-btn:hover {
-            background-color: #e03e00;
-        }
-        
-        /* Loading Animation */
-        .loader {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #ff4500;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         /* Pricing Page Styles */
         .pricing-page {
             display: none;
@@ -422,25 +319,7 @@
         <div class="home-content" id="home-page">
             <h1>Extract Contacts Like Never Before</h1>
             <p>CONTACTSCRAPE is the most powerful contact extraction tool on the market. Get accurate contact information from any website with just a few clicks.</p>
-            
-            <form method="POST" action="/" class="search-form">
-                <input type="text" name="keyword" class="search-input" placeholder="Enter search keyword (e.g., 'real estate agents')" required>
-                <button type="submit" class="search-button">Search Emails</button>
-            </form>
-            
-            <div class="loader" id="loader"></div>
-            
-            {% if download_file %}
-            <div class="results-container">
-                <h3 class="results-count">Found {{ emails|length }} emails:</h3>
-                <div class="emails-list">
-                    {% for email in emails %}
-                    <div class="email-item">{{ email }}</div>
-                    {% endfor %}
-                </div>
-                <a href="/download/{{ download_file }}" class="download-btn">Download CSV</a>
-            </div>
-            {% endif %}
+            <a href="#" class="choose-plan-btn" onclick="showPricing()">View Pricing Plans</a>
         </div>
         
         <!-- Pricing Page -->
@@ -460,7 +339,7 @@
                         <span class="discount">SAVE 67%</span>
                         <div class="monthly-price">$7.00 /mo</div>
                     </div>
-                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <a href="/scraper?plan=basic" class="choose-plan-btn">Get Started</a>
                     <div class="billing-info">Renews at $21.00/mo. Cancel anytime.</div>
                     <ul class="plan-features">
                         <li>1000 emails per month</li>
@@ -482,7 +361,7 @@
                         <div class="monthly-price">$14.00 /mo</div>
                     </div>
                     <div class="free-months">-3 months free</div>
-                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <a href="/scraper?plan=pro" class="choose-plan-btn">Get Started</a>
                     <div class="billing-info">Renews at $42.00/mo. Cancel anytime.</div>
                     <ul class="plan-features">
                         <li>5000 emails per month</li>
@@ -504,7 +383,7 @@
                         <div class="monthly-price">$21.00 /mo</div>
                     </div>
                     <div class="free-months">-3 months free</div>
-                    <a href="#" class="choose-plan-btn">Choose plan</a>
+                    <a href="/scraper?plan=business" class="choose-plan-btn">Get Started</a>
                     <div class="billing-info">Renews at $63.00/mo. Cancel anytime.</div>
                     <ul class="plan-features">
                         <li>Unlimited emails</li>
@@ -522,11 +401,11 @@
         <!-- How to Use Page -->
         <div class="info-page" id="how-to-use-page">
             <h1>How to Use CONTACTSCRAPE</h1>
-            <p>1. Enter a search term in the home page (e.g., "real estate agents in New York")</p>
-            <p>2. Click "Search Emails" to start the scraping process</p>
-            <p>3. View the extracted emails in real-time as they're discovered</p>
-            <p>4. Download the complete list as a CSV file when the process completes</p>
-            <p>5. Use the emails for your marketing campaigns, lead generation, or outreach</p>
+            <p>1. Choose your preferred plan from the Pricing page</p>
+            <p>2. Click "Get Started" to access the scraper interface</p>
+            <p>3. Enter your search term in the scraper tool</p>
+            <p>4. View extracted emails in real-time</p>
+            <p>5. Download your results as a CSV file</p>
         </div>
         
         <!-- About Us Page -->
@@ -536,7 +415,6 @@
             <p>Our team consists of experienced developers and data specialists who understand the challenges of finding quality leads.</p>
             <p>We believe in ethical web scraping and comply with all relevant data protection regulations.</p>
             <p>Thousands of businesses trust our tools to power their sales and marketing efforts.</p>
-            <p>Contact us at: info@contactscrape.com for any questions or partnership opportunities.</p>
         </div>
     </div>
     
@@ -597,11 +475,6 @@
             document.getElementById('how-to-use-page').style.display = 'none';
             document.getElementById('about-us-page').style.display = 'block';
         }
-        
-        // Show loading animation when form is submitted
-        document.querySelector('form').addEventListener('submit', function() {
-            document.getElementById('loader').style.display = 'block';
-        });
         
         // Show home page by default when page loads
         window.onload = showHome;

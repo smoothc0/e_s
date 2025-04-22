@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, Response, stream_with_context
+from flask import Flask, render_template, request, send_from_directory, Response, redirect, url_for
 import os
 from main import run_scraper, run_scraper_streaming, sanitize_filename
 
@@ -6,33 +6,48 @@ app = Flask(__name__, template_folder='templates')
 
 OUTPUT_DIR = 'output'
 
-@app.route('/', methods=['GET', 'POST'])
+# Valid plans we accept
+VALID_PLANS = ['basic', 'pro', 'business']
+
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        keyword = request.form.get('keyword')
-        if keyword:
-            result = run_scraper(keyword)
-            if result["file"]:
-                return render_template('index.html', download_file=result["file"], emails=result["emails"])
     return render_template('index.html')
+
+@app.route('/scraper')
+def scraper_interface():
+    # Verify plan is valid before showing scraper
+    plan = request.args.get('plan', '').lower()
+    if plan not in VALID_PLANS:
+        return redirect(url_for('index'))
+    
+    return render_template('scraper.html', plan=plan)
+
+@app.route('/scrape', methods=['POST'])
+def scrape_emails():
+    # Verify the request comes with a valid plan
+    plan = request.args.get('plan', '').lower()
+    if plan not in VALID_PLANS:
+        return {"error": "Plan required"}, 400
+    
+    keyword = request.form.get('keyword')
+    if not keyword:
+        return {"error": "Keyword required"}, 400
+    
+    # You could add plan-specific limits here
+    goal = 20  # Default for all plans
+    if plan == 'basic':
+        goal = 10
+    elif plan == 'pro':
+        goal = 20
+    elif plan == 'business':
+        goal = 50
+    
+    result = run_scraper(keyword, goal=goal)
+    return result
 
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
-
-@app.route('/stream')
-def stream():
-    keyword = request.args.get('keyword')
-    if not keyword:
-        return "Keyword required.", 400
-
-    def generate():
-        yield f"data: START\n\n"
-        for update in run_scraper_streaming(keyword):
-            yield f"data: {update}\n\n"
-        yield f"data: DONE|{sanitize_filename(keyword)}.csv\n\n"
-
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

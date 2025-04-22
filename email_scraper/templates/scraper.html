@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTACTSCRAPE | Scraper Interface</title>
+    <style>
+        /* Reuse your existing styles, adding specific ones for the scraper */
+        .scraper-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .scraper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .plan-indicator {
+            background: #ff4500;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        /* Rest of your existing styles */
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CONTACT<span>SCRAPE</span></div>
+        <nav>
+            <ul>
+                <li><a href="/">Back to Home</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="scraper-container">
+        <div class="scraper-header">
+            <h1>Email Scraper Interface</h1>
+            <div class="plan-indicator" id="planIndicator">Plan: Pro</div>
+        </div>
+        
+        <form method="POST" action="/scrape" class="search-form">
+            <input type="text" name="keyword" class="search-input" placeholder="Enter search keyword (e.g., 'real estate agents')" required>
+            <button type="submit" class="search-button">Start Scraping</button>
+        </form>
+        
+        <div class="loader" id="loader"></div>
+        
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <h3 class="results-count">Found <span id="emailCount">0</span> emails:</h3>
+            <div class="emails-list" id="emailsList"></div>
+            <a href="#" class="download-btn" id="downloadBtn">Download CSV</a>
+        </div>
+    </div>
+
+    <script>
+        // Check for plan selection
+        const plan = localStorage.getItem('selectedPlan');
+        if (!plan) {
+            window.location.href = '/';
+        }
+        
+        // Display current plan
+        document.getElementById('planIndicator').textContent = `Plan: ${plan.charAt(0).toUpperCase() + plan.slice(1)}`;
+        
+        // Form submission handling
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const keyword = document.querySelector('input[name="keyword"]').value;
+            const loader = document.getElementById('loader');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const emailsList = document.getElementById('emailsList');
+            const emailCount = document.getElementById('emailCount');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            loader.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            emailsList.innerHTML = '';
+            
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `keyword=${encodeURIComponent(keyword)}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.emails && data.emails.length > 0) {
+                    emailsList.innerHTML = data.emails.map(email => 
+                        `<div class="email-item">${email}</div>`
+                    ).join('');
+                    emailCount.textContent = data.emails.length;
+                    downloadBtn.href = `/download/${data.file}`;
+                    resultsContainer.style.display = 'block';
+                } else {
+                    alert('No emails found for this search term.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during scraping.');
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
