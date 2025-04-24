@@ -6,8 +6,6 @@ import time
 
 from utils import extract_emails
 from config import HEADERS, DELAY
-from email_scraper.config import config  # updated import
-
 
 
 class EmailScraper:

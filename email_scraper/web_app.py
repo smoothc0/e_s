@@ -1,71 +1,34 @@
-from flask import Flask, render_template, request, send_from_directory, redirect, url_for, jsonify
+from flask import Flask, render_template, request, send_from_directory, Response, stream_with_context
 import os
-from main import run_scraper
-from utils import sanitize_filename
-from pathlib import Path
+from main import run_scraper, run_scraper_streaming, sanitize_filename
 
-app = Flask(__name__, template_folder='templates')
-app.secret_key = os.environ.get('SECRET_KEY', 'fallback-secret-key')
+app = Flask(__name__)
 
-# Configuration
-OUTPUT_DIR = Path('output')
-OUTPUT_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR = 'output'
 
-# Valid plans
-VALID_PLANS = ['basic', 'pro', 'business']
-
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
-@app.route('/scraper')
-def scraper_interface():
-    plan = request.args.get('plan', '').lower()
-    if plan not in VALID_PLANS:
-        return redirect(url_for('index'))
-    return render_template('scraper.html', plan=plan)
-
-@app.route('/scrape', methods=['POST'])
-def scrape_emails():
-    try:
-        plan = request.args.get('plan', '').lower()
-        if plan not in VALID_PLANS:
-            return jsonify({"error": "Invalid plan"}), 400
-        
-        keyword = request.form.get('keyword', '').strip()
-        if not keyword:
-            return jsonify({"error": "Keyword is required"}), 400
-        
-        # Plan-based limits
-        plan_limits = {
-            'basic': 10,
-            'pro': 20,
-            'business': 50
-        }
-        
-        result = run_scraper(keyword, goal=plan_limits.get(plan, 20))
-        if not result.get('emails'):
-            return jsonify({"error": "No emails found"}), 404
-            
-        return jsonify(result)
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @app.route('/download/<filename>')
 def download_file(filename):
-    try:
-        # Security check
-        if not filename.endswith('.csv') or '..' in filename or '/' in filename:
-            return "Invalid file", 400
-            
-        filepath = OUTPUT_DIR / filename
-        if not filepath.exists():
-            return "File not found", 404
-            
-        return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
-    except Exception as e:
-        return str(e), 500
+    return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
+
+@app.route('/stream')
+def stream():
+    keyword = request.args.get('keyword')
+    if not keyword:
+        return "Keyword required.", 400
+
+    def generate():
+        yield f"data: START\n\n"
+
+        for update in run_scraper_streaming(keyword):
+            yield f"data: {update}\n\n"
+
+        yield f"data: DONE|{sanitize_filename(keyword)}.csv\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

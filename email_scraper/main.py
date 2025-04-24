@@ -1,10 +1,8 @@
-from email_scraper.scraper import EmailScraper
-from email_scraper.search import get_top_urls
-from email_scraper.utils import sanitize_filename, extract_emails
+from scraper import EmailScraper
+from search import get_top_urls
 import csv
 import os
 import re
-from pathlib import Path
 
 def sanitize_filename(keyword):
     return re.sub(r'\W+', '_', keyword.strip().lower())

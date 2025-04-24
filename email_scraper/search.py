@@ -1,13 +1,5 @@
 from serpapi import GoogleSearch
-from email_scraper.config import config
 from config import SERPAPI_KEY
-
-def get_top_urls(keyword, limit=10):
-    search = GoogleSearch({
-        "q": keyword,
-        "api_key": config.SERPAPI_KEY,  # using config value
-        "num": limit
-    })
 
 def get_top_urls(keyword, limit=10):
     search = GoogleSearch({
