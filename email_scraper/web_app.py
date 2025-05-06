@@ -1,34 +1,27 @@
-from flask import Flask, render_template, request, send_from_directory, Response, stream_with_context
+from flask import Flask, render_template, request, send_from_directory
 import os
-from main import run_scraper, run_scraper_streaming, sanitize_filename
+from main import run_scraper
 
 app = Flask(__name__)
-
 OUTPUT_DIR = 'output'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    emails = None
+    keyword = None
+    file = None
+
+    if request.method == 'POST':
+        keyword = request.form['keyword']
+        result = run_scraper(keyword)
+        emails = result.get('emails')
+        file = os.path.basename(result.get('file')) if result.get('file') else None
+
+    return render_template('index.html', emails=emails, keyword=keyword, file=file)
 
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(OUTPUT_DIR, filename, as_attachment=True)
-
-@app.route('/stream')
-def stream():
-    keyword = request.args.get('keyword')
-    if not keyword:
-        return "Keyword required.", 400
-
-    def generate():
-        yield f"data: START\n\n"
-
-        for update in run_scraper_streaming(keyword):
-            yield f"data: {update}\n\n"
-
-        yield f"data: DONE|{sanitize_filename(keyword)}.csv\n\n"
-
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

@@ -7,14 +7,14 @@ def get_top_urls(keyword, limit=10):
         "api_key": SERPAPI_KEY,
         "num": limit
     })
-    
+
     results = search.get_dict()
     organic = results.get("organic_results", [])
-    
+
     urls = []
     for result in organic:
         link = result.get("link")
         if link:
             urls.append(link)
-    
+
     return urls

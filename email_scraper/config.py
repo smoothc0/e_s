@@ -4,8 +4,6 @@ HEADERS = {
     "Connection": "keep-alive"
 }
 
-# Delay between requests (in seconds)
 DELAY = 1
 
-# Your free SerpAPI key
-SERPAPI_KEY = "5de591cfb44477e356c85e44654b578ed13cad5e2287cea4774d55704b628216"
+SERPAPI_KEY = "5de591cfb44477e356c85e44654b578ed13cad5e2287cea4774d55704b628216"  # Replace with your real key

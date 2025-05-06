@@ -7,7 +7,6 @@ import time
 from utils import extract_emails
 from config import HEADERS, DELAY
 
-
 class EmailScraper:
     def __init__(self, base_url, max_pages=20):
         self.base_url = base_url
@@ -33,16 +32,13 @@ class EmailScraper:
                 response = requests.get(url, headers=headers, timeout=10)
                 soup = BeautifulSoup(response.text, 'html.parser')
 
-                # Extract and save emails
                 new_emails = extract_emails(soup.text)
                 self.emails.update(new_emails)
 
-                # Extract internal links
                 for link in soup.find_all('a', href=True):
                     href = link['href']
                     full_url = urljoin(url, href)
 
-                    # Only add internal links (same domain)
                     if self._is_internal_link(full_url):
                         if full_url not in self.visited and full_url not in self.to_visit:
                             self.to_visit.append(full_url)
